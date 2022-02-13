@@ -18,7 +18,19 @@ export class MessageResolver {
 
 		message.ruText = ruText
 		message.engText = engText
-		if (message.isSent) await bot.editMessageText(engText, {chat_id: this.TG_CHAT_ID, message_id: message.tgMessageId})
+		if (message.isSent) {
+			if (message.photoId) {
+				await bot.editMessageCaption(engText, {
+					chat_id: this.TG_CHAT_ID,
+					message_id: message.tgMessageId,
+				});
+			} else {
+				await bot.editMessageText(engText, {
+					chat_id: this.TG_CHAT_ID,
+					message_id: message.tgMessageId,
+				});
+			}
+		}
 		await em.persistAndFlush(message)
 		return message
 	}
@@ -50,8 +62,15 @@ export class MessageResolver {
 		@Arg('id') id: number,
 	) {
 		const message = await em.findOne(Message, {id})
+
 		if (!message) return false
-		if (message.isSent) await bot.deleteMessage(this.TG_CHAT_ID, String(message.tgMessageId))
+		if (message.isSent) {
+			try {
+				await bot.deleteMessage(this.TG_CHAT_ID, String(message.tgMessageId));
+			} catch (e) {
+				console.error(e)
+			}
+		}
 		await em.removeAndFlush(message)
 		return true
 	}

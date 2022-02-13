@@ -6,12 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@mikro-orm/core");
 const path_1 = __importDefault(require("path"));
 const Message_1 = require("./entities/Message");
+const SendChat_1 = require("./entities/SendChat");
+const UserSettings_1 = require("./entities/UserSettings");
 exports.default = {
     migrations: {
         path: path_1.default.join(__dirname, './migrations'),
         pattern: /^[\w-]+\d+\.[tj]s$/,
     },
-    entities: [Message_1.Message],
+    entities: [Message_1.Message, SendChat_1.SendChat, UserSettings_1.UserSettings],
     host: 'localhost',
     port: 5432,
     user: 'postgres',

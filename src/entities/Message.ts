@@ -9,9 +9,13 @@ export class Message {
     @PrimaryKey()
     id!: number
 
-    @Field(() => String, {nullable: true})
+    @Field(() => Number, {nullable: true})
     @Property({type: 'number', nullable: true})
     tgMessageId!: number
+
+    @Field(() => String, {nullable: true})
+    @Property({type: 'string', nullable: true})
+    photoId?: string
 
     @Field(() => String)
     @Property({type: 'date'})
@@ -23,7 +27,7 @@ export class Message {
 
     @Field(() => String, {nullable: true})
     @Property({type: 'text'})
-    ruText!: string
+    ruText?: string
 
     @Field(() => String, {nullable: true})
     @Property({type: 'text'})
