@@ -12,7 +12,7 @@ export default {
 	entities: [Message, SendChat, UserSettings],
 	host: 'localhost',
 	port: 5432,
-	user: 'postgres',
+	user: 'root',
 	password: 'postgres',
 	dbName: 'postgres',
 	type: 'postgresql',
