@@ -16,7 +16,7 @@ exports.default = {
     entities: [Message_1.Message, SendChat_1.SendChat, UserSettings_1.UserSettings],
     host: 'localhost',
     port: 5432,
-    user: 'postgres',
+    user: 'root',
     password: 'postgres',
     dbName: 'postgres',
     type: 'postgresql',
