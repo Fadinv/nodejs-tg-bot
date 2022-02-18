@@ -18,7 +18,7 @@ exports.default = {
     port: 5432,
     user: 'postgres',
     password: 'postgres',
-    dbName: 'pg_default',
+    dbName: 'postgres',
     type: 'postgresql',
     debug: true,
     loadStrategy: core_1.LoadStrategy.SELECT_IN,
