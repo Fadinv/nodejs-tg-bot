@@ -15,7 +15,7 @@ import {Message} from './entities/Message';
 
 let port = process.env.PORT as any;
 if (port == null || port == '') {
-	port = 8000;
+	port = 2000;
 }
 
 const main = async () => {

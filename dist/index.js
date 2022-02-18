@@ -18,7 +18,7 @@ const node_fetch_1 = __importDefault(require("node-fetch"));
 const Message_1 = require("./entities/Message");
 let port = process.env.PORT;
 if (port == null || port == '') {
-    port = 8000;
+    port = 2000;
 }
 const main = async () => {
     const orm = await core_1.MikroORM.init(mikro_orm_config_1.default);
