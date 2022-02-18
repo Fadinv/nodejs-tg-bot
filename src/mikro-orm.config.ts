@@ -10,7 +10,7 @@ export default {
 		pattern: /^[\w-]+\d+\.[tj]s$/,
 	},
 	entities: [Message, SendChat, UserSettings],
-	host: '81.163.26.147',
+	host: 'http://81.163.26.147',
 	port: 5432,
 	user: 'postgres',
 	password: 'postgres',

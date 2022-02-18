@@ -14,7 +14,7 @@ exports.default = {
         pattern: /^[\w-]+\d+\.[tj]s$/,
     },
     entities: [Message_1.Message, SendChat_1.SendChat, UserSettings_1.UserSettings],
-    host: '81.163.26.147',
+    host: 'http://81.163.26.147',
     port: 5432,
     user: 'postgres',
     password: 'postgres',
