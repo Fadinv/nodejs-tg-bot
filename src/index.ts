@@ -112,7 +112,7 @@ const main = async () => {
 		context: (): MyContext => ({em: orm.em, bot}),
 	});
 	app.use(cors({
-		origin: 'http://localhost:3000',
+		origin: 'http://81.163.26.147:3000/',
 		credentials: true,
 	}));
 	apolloServer.applyMiddleware({app, cors: false});
