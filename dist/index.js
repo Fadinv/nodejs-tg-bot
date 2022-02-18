@@ -25,6 +25,7 @@ const main = async () => {
     await orm.getMigrator().up();
     const app = (0, express_1.default)();
     const TOKEN = process.env.TOKEN;
+    console.log('TG BOT TOKEN -> ', TOKEN);
     const bot = new node_telegram_bot_api_1.default(TOKEN || '', { polling: true });
     const userSettings = await orm.em.findOne(UserSettings_1.UserSettings, { id: 1 });
     if (!userSettings) {
