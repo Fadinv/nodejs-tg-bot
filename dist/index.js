@@ -3,6 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const https_1 = __importDefault(require("https"));
+const fs_1 = __importDefault(require("fs"));
 const core_1 = require("@mikro-orm/core");
 const express_1 = __importDefault(require("express"));
 const apollo_server_express_1 = require("apollo-server-express");
@@ -113,7 +115,10 @@ const main = async () => {
     app.get('/', (_, res) => {
         res.send('hello guys');
     });
-    app.listen(port, () => {
+    https_1.default.createServer({
+        key: fs_1.default.readFileSync('/etc/ssl/private/private.key'),
+        cert: fs_1.default.readFileSync('/etc/ssl/certificate.crt'),
+    }, app).listen(port, () => {
         console.log(`server started on localhost:${port}`);
     });
     const saveToDB = async (properties) => {

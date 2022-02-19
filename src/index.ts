@@ -1,3 +1,5 @@
+import https from 'https';
+import fs from 'fs';
 import {EntityManager, IDatabaseDriver, MikroORM} from '@mikro-orm/core';
 import express from 'express';
 import {ApolloServer} from 'apollo-server-express';
@@ -120,12 +122,12 @@ const main = async () => {
 		res.send('hello guys');
 	});
 	//
-	app.listen(port, () => {
+	https.createServer({
+		key: fs.readFileSync('/etc/ssl/private/private.key'),
+		cert: fs.readFileSync('/etc/ssl/certificate.crt'),
+	}, app).listen(port, () => {
 		console.log(`server started on localhost:${port}`);
 	});
-	//
-	// bot api
-	//
 	const saveToDB = async (properties: { ru: string | undefined; eng: string, tgMessageId: number, photoId?: string }) => {
 		const ruText = properties.ru;
 
