@@ -26,6 +26,11 @@ const main = async () => {
 	const app = express();
 	const TOKEN = process.env.TOKEN;
 	console.log('TOKEN -> ', TOKEN);
+	if (!TOKEN) {
+		setInterval(() => {
+			console.log('TOKEN has not', TOKEN)
+		})
+	}
 	const bot = new TelegramApi(TOKEN || '', {polling: true});
 
 	const userSettings = await orm.em.findOne(UserSettings, {id: 1});
