@@ -107,7 +107,7 @@ const main = async () => {
         context: () => ({ em: orm.em, bot }),
     });
     app.use((0, cors_1.default)({
-        origin: 'http://81.163.26.147:3000',
+        origin: 'https://web-page-bot.vercel.app/',
         credentials: true,
     }));
     apolloServer.applyMiddleware({ app, cors: false });
