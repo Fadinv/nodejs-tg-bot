@@ -23,7 +23,6 @@ const main = async () => {
 	await orm.getMigrator().up();
 	const app = express();
 	const TOKEN = process.env.TOKEN;
-	console.log('TG BOT TOKEN -> ', TOKEN)
 	const bot = new TelegramApi(TOKEN || '', {polling: true});
 
 	const userSettings = await orm.em.findOne(UserSettings, {id: 1});
@@ -112,7 +111,7 @@ const main = async () => {
 		context: (): MyContext => ({em: orm.em, bot}),
 	});
 	app.use(cors({
-		origin: 'https://web-page-bot.vercel.app',
+		origin: 'web-page-bot.vercel.app',
 		credentials: true,
 	}));
 	apolloServer.applyMiddleware({app, cors: false});
