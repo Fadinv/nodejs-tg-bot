@@ -55,8 +55,8 @@ const main = async () => {
 				method: 'POST',
 				body: JSON.stringify({
 					q: caption,
-					source: 'ru',
-					target: 'en',
+					source: 'en',
+					target: 'ru',
 					format: 'text',
 				}),
 				headers: {'Content-Type': 'application/json'},
