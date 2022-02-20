@@ -49,7 +49,7 @@ const main = async () => {
         if (!photoObject)
             return;
         const photoId = photoObject.file_id;
-        let eng = '';
+        let ru = '';
         if (typeof caption === 'string') {
             await (0, node_fetch_1.default)('https://libretranslate.de/translate', {
                 method: 'POST',
@@ -62,10 +62,10 @@ const main = async () => {
                 headers: { 'Content-Type': 'application/json' },
             })
                 .then(res => res.json())
-                .then(res => eng = res.translatedText);
+                .then(res => ru = res.translatedText);
         }
         try {
-            await saveToDB({ ru: caption, eng, photoId, tgMessageId: msg.message_id });
+            await saveToDB({ ru, eng: caption, photoId, tgMessageId: msg.message_id });
         }
         catch (e) {
             console.error('error sendPhoto', e);
@@ -80,8 +80,8 @@ const main = async () => {
                 method: 'POST',
                 body: JSON.stringify({
                     q: text,
-                    source: 'ru',
-                    target: 'en',
+                    source: 'en',
+                    target: 'ru',
                     format: 'text',
                 }),
                 headers: { 'Content-Type': 'application/json' },
@@ -90,7 +90,7 @@ const main = async () => {
                 .then(res => translatedText = res.translatedText);
         }
         if (text && translatedText) {
-            await saveToDB({ ru: text, eng: translatedText, tgMessageId: +msg.message_id || 0 });
+            await saveToDB({ ru: translatedText, eng: text, tgMessageId: +msg.message_id || 0 });
         }
         switch (text) {
             case '/start':
@@ -167,8 +167,8 @@ const main = async () => {
         const chatId = process.env.SEND_CHAT_ID ? +process.env.SEND_CHAT_ID : 0;
         try {
             const res = m.photoId
-                ? await bot.sendPhoto(chatId, m.photoId, { caption: m.engText })
-                : await bot.sendMessage(chatId, m.engText);
+                ? await bot.sendPhoto(chatId, m.photoId, { caption: m.ruText })
+                : await bot.sendMessage(chatId, m.ruText || '');
             m.tgMessageId = res.message_id;
             await setIsSentMessageStatus(m, em);
         }

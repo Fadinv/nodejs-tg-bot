@@ -48,7 +48,7 @@ const main = async () => {
 		const photoObject = photo?.[photo.length - 1];
 		if (!photoObject) return;
 		const photoId = photoObject.file_id;
-		let eng = '';
+		let ru = '';
 
 		if (typeof caption === 'string') {
 			await fetch('https://libretranslate.de/translate', {
@@ -62,11 +62,11 @@ const main = async () => {
 				headers: {'Content-Type': 'application/json'},
 			})
 				.then(res => res.json())
-				.then(res => eng = res.translatedText);
+				.then(res => ru = res.translatedText);
 		}
 
 		try {
-			await saveToDB({ru: caption, eng, photoId, tgMessageId: msg.message_id});
+			await saveToDB({ru, eng: caption, photoId, tgMessageId: msg.message_id});
 		} catch (e) {
 			console.error('error sendPhoto', e);
 		}
@@ -83,8 +83,8 @@ const main = async () => {
 				method: 'POST',
 				body: JSON.stringify({
 					q: text,
-					source: 'ru',
-					target: 'en',
+					source: 'en',
+					target: 'ru',
 					format: 'text',
 				}),
 				headers: {'Content-Type': 'application/json'},
@@ -94,7 +94,7 @@ const main = async () => {
 		}
 
 		if (text && translatedText) {
-			await saveToDB({ru: text, eng: translatedText, tgMessageId: +msg.message_id || 0});
+			await saveToDB({ru: translatedText, eng: text, tgMessageId: +msg.message_id || 0});
 		}
 
 		switch (text) {
@@ -134,7 +134,7 @@ const main = async () => {
 	}, app).listen(port, () => {
 		console.log(`server started on localhost:${port}`);
 	});
-	const saveToDB = async (properties: { ru: string | undefined; eng: string, tgMessageId: number, photoId?: string }) => {
+	const saveToDB = async (properties: { ru: string | undefined; eng: string | undefined, tgMessageId: number, photoId?: string }) => {
 		const ruText = properties.ru;
 
 		const engText = properties.eng;
@@ -177,8 +177,8 @@ const main = async () => {
 
 		try {
 			const res = m.photoId
-				? await bot.sendPhoto(chatId, m.photoId, {caption: m.engText})
-				: await bot.sendMessage(chatId, m.engText);
+				? await bot.sendPhoto(chatId, m.photoId, {caption: m.ruText})
+				: await bot.sendMessage(chatId, m.ruText || '');
 			m.tgMessageId = res.message_id;
 			await setIsSentMessageStatus(m, em);
 		} catch (e) { //
