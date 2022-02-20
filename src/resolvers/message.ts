@@ -20,12 +20,12 @@ export class MessageResolver {
 		message.engText = engText
 		if (message.isSent) {
 			if (message.photoId) {
-				await bot.editMessageCaption(engText, {
+				await bot.editMessageCaption(ruText, {
 					chat_id: this.TG_CHAT_ID,
 					message_id: message.tgMessageId,
 				});
 			} else {
-				await bot.editMessageText(engText, {
+				await bot.editMessageText(ruText, {
 					chat_id: this.TG_CHAT_ID,
 					message_id: message.tgMessageId,
 				});
