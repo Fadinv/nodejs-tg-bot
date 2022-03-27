@@ -62,7 +62,6 @@ const main = async () => {
 				});
 				if (withoutHashTags.length) splittedText.push(withoutHashTags.join(' '));
 			});
-			// const auth_key = '2c004365-8a7c-2396-9cd6-0b464d46c1e2:fx';
 			await Promise.all(
 				splittedText.map(async (text) => {
 					if (text.startsWith('#')) {
@@ -111,7 +110,6 @@ const main = async () => {
 				});
 				if (withoutHashTags.length) splittedText.push(withoutHashTags.join(' '));
 			});
-			// const auth_key = '2c004365-8a7c-2396-9cd6-0b464d46c1e2:fx';
 			await Promise.all(
 				splittedText.map(async (text) => {
 					if (text.startsWith('#')) {
