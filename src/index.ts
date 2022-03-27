@@ -25,12 +25,7 @@ const main = async () => {
 	await orm.getMigrator().up();
 	const app = express();
 	const TOKEN = process.env.TOKEN;
-	console.log('TOKEN -> ', TOKEN);
-	if (!TOKEN) {
-		setInterval(() => {
-			console.log('TOKEN has not', TOKEN)
-		})
-	}
+	const auth_key = process.env.DEEPL_AUTH_KEY;
 	const bot = new TelegramApi(TOKEN || '', {polling: true});
 
 	const userSettings = await orm.em.findOne(UserSettings, {id: 1});
@@ -45,28 +40,50 @@ const main = async () => {
 
 	bot.on('photo', async (msg) => {
 		const {caption, photo} = msg;
+		const text = caption;
 		const photoObject = photo?.[photo.length - 1];
 		if (!photoObject) return;
 		const photoId = photoObject.file_id;
-		let ru = '';
+		let translatedText = '';
 
 		if (typeof caption === 'string') {
-			await fetch('https://libretranslate.de/translate', {
-				method: 'POST',
-				body: JSON.stringify({
-					q: caption,
-					source: 'en',
-					target: 'ru',
-					format: 'text',
+			let responseText: string[] = [];
+			const splittedText: string[] = []
+			const textRows = (text || '').split('\n');
+			textRows.forEach(row => {
+				const rowWords = row.split(' ');
+				const withoutHashTags: string[] = [];
+				rowWords.forEach(w => {
+					if (w.startsWith('#')) {
+						splittedText.push(w);
+					} else {
+						withoutHashTags.push(w);
+					}
+				});
+				if (withoutHashTags.length) splittedText.push(withoutHashTags.join(' '));
+			});
+			// const auth_key = '2c004365-8a7c-2396-9cd6-0b464d46c1e2:fx';
+			await Promise.all(
+				splittedText.map(async (text) => {
+					if (text.startsWith('#')) {
+						responseText.push(text);
+						return;
+					}
+					await fetch(`https://api-free.deepl.com/v2/translate?auth_key=${auth_key}&text=${text}&target_lang=RU`, {
+						method: 'POST',
+						headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+					})
+						.then(res => res.json())
+						.then(res => {
+							res?.translations.map((tr: any) => responseText.push(tr?.text || ''));
+						});
 				}),
-				headers: {'Content-Type': 'application/json'},
-			})
-				.then(res => res.json())
-				.then(res => ru = res.translatedText);
+			);
+			translatedText = responseText.join('\n');
 		}
 
 		try {
-			await saveToDB({ru, eng: caption, photoId, tgMessageId: msg.message_id});
+			await saveToDB({ru: translatedText, eng: caption, photoId, tgMessageId: msg.message_id});
 		} catch (e) {
 			console.error('error sendPhoto', e);
 		}
@@ -79,18 +96,39 @@ const main = async () => {
 		let translatedText = '';
 
 		if (typeof text === 'string') {
-			await fetch('https://libretranslate.de/translate', {
-				method: 'POST',
-				body: JSON.stringify({
-					q: text,
-					source: 'en',
-					target: 'ru',
-					format: 'text',
+			let responseText: string[] = [];
+			const splittedText: string[] = []
+			const textRows = (text || '').split('\n');
+			textRows.forEach(row => {
+				const rowWords = row.split(' ');
+				const withoutHashTags: string[] = [];
+				rowWords.forEach(w => {
+					if (w.startsWith('#')) {
+						splittedText.push(w);
+					} else {
+						withoutHashTags.push(w);
+					}
+				});
+				if (withoutHashTags.length) splittedText.push(withoutHashTags.join(' '));
+			});
+			// const auth_key = '2c004365-8a7c-2396-9cd6-0b464d46c1e2:fx';
+			await Promise.all(
+				splittedText.map(async (text) => {
+					if (text.startsWith('#')) {
+						responseText.push(text);
+						return;
+					}
+					await fetch(`https://api-free.deepl.com/v2/translate?auth_key=${auth_key}&text=${text}&target_lang=RU`, {
+						method: 'POST',
+						headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+					})
+						.then(res => res.json())
+						.then(res => {
+							res?.translations.map((tr: any) => responseText.push(tr?.text || ''));
+						});
 				}),
-				headers: {'Content-Type': 'application/json'},
-			})
-				.then(res => res.json())
-				.then(res => translatedText = res.translatedText);
+			);
+			translatedText = responseText.join('\n');
 		}
 
 		if (text && translatedText) {
@@ -106,7 +144,7 @@ const main = async () => {
 				await bot.sendMessage(chatId, `Вызвана команда /info, еще не доделана`);
 				break;
 			default:
-				await bot.sendMessage(chatId, 'Вы мне написали:\n' + text + `\nПеревод:\n${translatedText}` || 'Ничего не понял');
+				await bot.sendMessage(chatId, 'Вы мне написали:\n' + text + `\nПеревод:\n${translatedText}`);
 		}
 	});
 	const apolloServer = new ApolloServer({
@@ -119,7 +157,7 @@ const main = async () => {
 		context: (): MyContext => ({em: orm.em, bot}),
 	});
 	app.use(cors({
-		origin: ['https://web-page-bot.vercel.app', 'https://127.0.0.1', 'https://81.163.26.147'],
+		origin: ['https://web-page-bot.vercel.app', 'https://127.0.0.1', 'https://81.163.26.147', 'http://localhost:3000'],
 		credentials: true,
 	}));
 	apolloServer.applyMiddleware({app, cors: false});
@@ -128,6 +166,9 @@ const main = async () => {
 		res.send('hello guys');
 	});
 	//
+	// app.listen(port, () => {
+	// 	console.log(`server started on localhost:${port}`);
+	// });
 	https.createServer({
 		key: fs.readFileSync('/etc/ssl/private/private.key'),
 		cert: fs.readFileSync('/etc/ssl/certificate.crt'),
@@ -176,13 +217,17 @@ const main = async () => {
 		const chatId = process.env.SEND_CHAT_ID ? +process.env.SEND_CHAT_ID : 0;
 
 		try {
-			const res = m.photoId
-				? await bot.sendPhoto(chatId, m.photoId, {caption: m.ruText})
-				: await bot.sendMessage(chatId, m.ruText || '');
-			m.tgMessageId = res.message_id;
-			await setIsSentMessageStatus(m, em);
+			if (!m.ruText?.trim()) {
+				await orm.em.nativeDelete(Message, {id: m.id});
+			} else {
+				const res = m.photoId
+					? await bot.sendPhoto(chatId, m.photoId, {caption: m.ruText || 'Пустое сообщение'})
+					: await bot.sendMessage(chatId, m.ruText || 'Пустое сообщение');
+				m.tgMessageId = res.message_id;
+				await setIsSentMessageStatus(m, em);
+			}
 		} catch (e) { //
-			console.error(e);
+			console.error(e, !m.ruText);
 		}
 
 		setTimeout(sendLastMessage, TIMEOUT_DELEY);
